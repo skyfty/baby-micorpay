@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        <title>Hello World</title>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+        <script type="text/javascript" src="baby.js"></script>
+        <link rel="stylesheet" href="fonts/iconfont.css"/>
+        <link rel="stylesheet" href="css/font.css"/>
+        <link rel="stylesheet" href="css/mui.css"/>
+        <link rel="stylesheet" href="css/weui.min.css"/>
+        <link rel="stylesheet" href="css/jquery-weui.min.css"/>
+        <link rel="stylesheet" href="css/animate.css"/>
+        <link rel="stylesheet" href="css/pages/login.css"/>
+
+
+        <link rel="stylesheet" href="css/zdialog.css"/>
+        <script type="text/javascript" src="js/zdialog.js"></script>
+
+        <script>(function (doc, win) {
+          var docEl = doc.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+            recalc = function () {
+              var clientWidth = docEl.clientWidth;
+              if (!clientWidth) return;
+              docEl.style.fontSize = 20 * (clientWidth / 320) + 'px';
+            };
+
+          if (!doc.addEventListener) return;
+          win.addEventListener(resizeEvt, recalc, false);
+          doc.addEventListener('DOMContentLoaded', recalc, false);
+        })(document, window);</script>
+    </head>
+    <body>
+    <div class="header">
+        <img src="images/slogo.png">
+
+        <h2>阿姨汇订单系统</h2>
+    </div>
+    <div class="login-wrap">
+        <div class="login-box">
+            <form>
+                <div class="input-wrap">
+                    <input type="text" name="name" id="name" value="admin" placeholder="帐号"/>
+                </div>
+                <div class="input-wrap">
+                    <input type="text" name="password" id="password" value="houtai98755" placeholder="密码"/>
+                </div>
+            </form>
+        </div>
+        <div class="btns">
+        </div>
+        <a href="javascript:void(0);" id="loginbtn" class="weui_btn login-btn weui_btn_primary">登录</a>
+
+    </div>
+    <div class="footer">
+        ©2015 北京阿姨汇科技服务有限公司 ourbaby.cc 版权所有
+    </div>
+    </body>
+</html>
+
+<script>
+    document.addEventListener("deviceready", function(){
+        $("#loginbtn").click(function(){
+            var name = $("#name").val();
+            var password = $("#password").val();
+            cordova.exec(null, null, "BabyPlugin", "action_login", [name, password]);
+        });
+    }, false);
+
+
+    $(document).keydown(function (event) {
+        if ($.DialogByZ.state) {
+            $(".zbox-popup-button[index_key='"+event.keyCode+"']").click();
+            return false;
+        } else {
+            $("#loginbtn").click();
+        }
+    });
+</script>

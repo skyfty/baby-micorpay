@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="baby.js"></script>
+    <link rel="stylesheet" href="fonts/iconfont.css"/>
+    <link rel="stylesheet" href="css/font.css"/>
+    <link rel="stylesheet" href="css/weui.min.css"/>
+    <link rel="stylesheet" href="css/jquery-weui.min.css"/>
+    <link rel="stylesheet" href="css/mui.css"/>
+    <link rel="stylesheet" href="css/animate.css"/>
+    <link rel="stylesheet" href="css/pages/order.css"/>
+    <link rel="stylesheet" href="css/frozen.css">
+
+    <link rel="stylesheet" href="css/zdialog.css"/>
+    <script type="text/javascript" src="js/zdialog.js"></script>
+
+    <script>(function (doc, win) {
+          var docEl = doc.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+            recalc = function () {
+              var clientWidth = docEl.clientWidth;
+              if (!clientWidth) return;
+              docEl.style.fontSize = 20 * (clientWidth / 320) + 'px';
+            };
+
+          if (!doc.addEventListener) return;
+          win.addEventListener(resizeEvt, recalc, false);
+          doc.addEventListener('DOMContentLoaded', recalc, false);
+        })(document, window);</script>
+</head>
+<body>
+<header>
+    <div class="titlebar reverse">
+        <a href="javascript:void(0);" onclick="on_back()">
+            <i class="iconfont">&#xe640;</i>
+        </a>
+        <h1>支付</h1>
+    </div>
+</header>
+<article style="bottom: 0;">
+    <ul class="xunjia-box">
+        <li class="inner">
+            <div class="item-name">订单：</div>
+            <div class="item-value"><span id="idcode"></span> - <span id="status_name"></span></div>
+        </li>
+        <li class="inner">
+            <div class="item-name">服务类型：</div>
+            <div class="item-value"><span id="category_name"></span></div>
+        </li>
+        <li class="inner">
+            <div class="item-name">备注：</div>
+            <div class="item-value"><span id="desc"></span></div>
+        </li>
+    </ul>
+    <div class="details">
+        <div class="detail-box" style="height:80px">
+            <div class="detail-title">向北京阿姨汇科技服务有限公司支付</div>
+            <div class="detail-wrap">
+                <div class="  ui-form ui-border-t">
+                    <div class="ui-form-item ui-form-item-l ui-border-b">
+                        <label class="ui-border-r">
+                            金额（￥）
+                        </label>
+                        <input  type="number" id="total_fee" placeholder="请输入金额">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="button">
+        <div class="bd">
+            <a href="javascript:void(0);" onclick="on_pay();" id="submit_button" class="weui_btn weui_btn_primary">确认</a>
+        </div>
+    </div>
+</article>
+
+<footer>
+
+</footer>
+
+</body>
+</html>
+
+<script>
+
+    $(document).keydown(function (event) {
+        if ($.DialogByZ.state) {
+            $(".zbox-popup-button[index_key='"+event.keyCode+"']").click();
+            return false;
+        } else if(event.keyCode == 13) {
+            $("#submit_button").click();
+        }
+    });
+
+    function on_back() {
+        finish_activity("back");
+    }
+    function on_pay() {
+        var total_fee = $("#total_fee").val();
+        if (total_fee <= 0) {
+            $.DialogByZ.Alert({Title: "", Content: "支付金额不正确!",FunL:function(){
+                $.DialogByZ.Close();
+            }});
+            return;
+        }
+
+        setTimeout(function(){
+            var market_id = getQueryString("id");
+            cordova.exec(function(){
+                finish_activity("ok");
+            }, function(){
+                finish_activity();
+            }, "BabyPlugin", "pay_select", [market_id, total_fee]);
+        },200)
+    }
+
+    document.addEventListener("deviceready", function(){
+        var market_id = getQueryString("id");
+        if (market_id) {
+            var url = U("PyMarket","getinfo");
+            var options = {
+                'url': url,
+                'cache':false,
+                'data': {
+                    'id':market_id,
+                    "login_role_id":getQueryString("login_role_id")
+                },
+                'beforeSend':function(){
+                    showProgressDialog("请等待...");
+                },
+                'success': function(data) {
+                    if (data.code == 0) {
+                        var market = data.body;
+                        $("#idcode").html(market.market_idcode);
+                        $("#category_name").html(market.category_name);
+                        $("#customer_name").html(market.customer_name);
+                        $("#customer_telephone").html(market.customer_telephone);
+                        $("#status_name").html(market.status_name);
+                        $("#total_fee").val("0.01");
+                    } else {
+                       $.DialogByZ.Alert({Title: "", Content: data.error,FunL:function(){
+                            $.DialogByZ.Close();
+                            finish_activity();
+                       }});
+                    }
+                },
+                'error':function(xhr,status,error) {
+                   $.DialogByZ.Alert({Title: "", Content: status,FunL:function(){
+                        $.DialogByZ.Close();
+                        finish_activity();
+                   }});
+                },
+                'complete':function(){
+                    hideProgressDialog();
+                }
+            };
+            $.ajax(options);
+        }
+    }, false);
+
+</script>

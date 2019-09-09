@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">奥宝母婴</string>
+    <string name="network_error">Network Error</string>
+    <string name="timeout">网络访问超时</string>
+    <string name="load_error">数据加载出错</string>
+    <string name="no_version">当前已经是最新版本！</string>
+    <string name="upgrade">更新</string>
+    <string name="cancel">取消</string>
+        <string name="back">返回</string>
+    <string name="complete">完成</string>
+    <string name="print_next">下一联</string>
+    <string name="tip_print_next">打印完成， 是否继续打印下一联?</string>
+    <string name="tip_print_failed">打印失败?</string>
+    <string name="tip_print_ourpage">打印机缺纸， 放置纸张后重试?</string>
+
+    <string name="failed">失败</string>
+    <string name="retry">重试</string>
+
+    <string name="category_error">无效的类别</string>
+
+    <string name="ok">确定</string>
+
+    <string name="loading_login">登录中...</string>
+    <string name="login_error">登录失败</string>
+    <string name="please_input_username">请输入用户名</string>
+    <string name="please_input_password">请输入密码</string>
+    <string name="tip_find_newversion">发现新版本</string>
+    <string name="tip_begin_download">开始下载&#830;</string>
+    <string name="label_file_download">已下载%1$s</string>
+    <string name="label_setting_newversion">新版本:%1$s</string>
+    <string name="tip_loading">正在%1$s,请稍候&#8230;</string>
+    <string name="common_detection">检测</string>
+    <string name="tip_not_login">未登录</string>
+
+</resources>

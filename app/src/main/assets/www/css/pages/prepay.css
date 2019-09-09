@@ -1,0 +1,28 @@
+
+.titlebar.reverse{
+	border-color:#0498a1; 
+}
+
+
+article{
+	position: relative;
+}
+
+.button .bd {
+    padding: 0 15px;
+}
+
+.button .bd .weui_btn{
+    font-size: 0.875rem;
+    line-height: 2.125rem;
+    height: 2.125rem;
+}
+
+.weui_btn_primary{
+	margin-top: 20px;
+	background-color: #f45438;
+}
+
+.weui_btn_primary:not(.weui_btn_disabled):active {
+    background-color: #f45438;
+}

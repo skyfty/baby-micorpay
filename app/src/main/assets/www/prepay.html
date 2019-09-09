@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        <title>Hello World</title>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
+        <script type="text/javascript" src="baby.js"></script>
+        <link rel="stylesheet" href="fonts/iconfont.css"/>
+        <link rel="stylesheet" href="css/font.css"/>
+        <link rel="stylesheet" href="css/mui.css"/>
+        <link rel="stylesheet" href="css/weui.min.css"/>
+        <link rel="stylesheet" href="css/jquery-weui.min.css"/>
+        <link rel="stylesheet" href="css/mui.css"/>
+        <link rel="stylesheet" href="css/animate.css"/>
+        <link rel="stylesheet" href="css/pages/prepay.css"/>
+
+        <link rel="stylesheet" href="css/zdialog.css"/>
+        <script type="text/javascript" src="js/zdialog.js"></script>
+
+        <script>(function (doc, win) {
+          var docEl = doc.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+            recalc = function () {
+              var clientWidth = docEl.clientWidth;
+              if (!clientWidth) return;
+              docEl.style.fontSize = 20 * (clientWidth / 320) + 'px';
+            };
+
+          if (!doc.addEventListener) return;
+          win.addEventListener(resizeEvt, recalc, false);
+          doc.addEventListener('DOMContentLoaded', recalc, false);
+        })(document, window);</script>
+    </head>
+    <body>
+    <header>
+        <div class="titlebar reverse">
+            <h1>正在支付</h1>
+        </div>
+    </header>
+    <article>
+        <div class="no-data" style="text-align:center">
+                <span>
+                    <i class="iconfont">&#xe620;</i>
+                </span>
+            <label id="message">启动支付...</label>
+        </div>
+        <div class="button">
+            <div class="bd">
+                <a id="cancel_btn" href="javascript:void(0);" onclick="on_cancel_pay();" class="weui_btn weui_btn_primary">取消支付</a>
+            </div>
+        </div>
+    </article>
+
+    </body>
+</html>
+
+<script>
+    var pay_channel = getQueryString("pay_channel");
+    var pay_channel_mode = getQueryString("pay_channel_mode");
+    var terminal_no = getQueryString("terminal_no");
+    var market_id = getQueryString("market_id");
+    var total_fee = getQueryString("total_fee");
+    var login_role_id = getQueryString("login_role_id");
+    var paylog_id = null;
+
+
+    $(document).keydown(function (event) {
+        if ($.DialogByZ.state) {
+            $(".zbox-popup-button[index_key='"+event.keyCode+"']").click();
+            return false;
+        } else if(event.keyCode == 27) {
+            $("#cancel_btn").click();
+        }
+    });
+
+    function success_pay(paylog) {
+        paylog_id = null;
+        $("#cancel_btn").attr("disabled", true);
+        $("#message").html(paylog.code_desc?paylog.code_desc:"支付成功, 正在打印凭证");
+        print_market_payinfo(paylog);
+    }
+
+    function print_market_payinfo(paylog) {
+        var market = paylog.market_info;
+        market['market_pay_amount'] = paylog['total_fee'];
+        var date = new Date();
+        market['market_pay_time'] = date.toLocaleTimeString();
+        market['pay_channel_name'] = paylog['pay_channel_name'];
+        var serve_modality = market['serve_modality'];
+        if (serve_modality == 6 || serve_modality == 14) {
+            serve_modality = "次";
+        } else {
+            serve_modality = "天";
+        }
+        market['market_info'] = market['category_name'] + market['period'] + serve_modality;
+
+        cordova.exec(function(data){
+            finish_activity("ok");
+        }, function(){
+            finish_activity("cancel");
+        },"BabyPlugin", "print_market", [JSON.stringify(market)]);
+    }
+
+    function on_cancel_pay() {
+        if (paylog_id == null) {
+            finish_activity("cancel");
+            return;
+        }
+        $.DialogByZ.Confirm({Title: "", Content: "确实要取消支付吗?",FunL:function(){
+            pay_reverse();
+            finish_activity("cancel");
+       },FunR:function(){$.DialogByZ.Close()}});
+    }
+
+    function pay_reverse() {
+        if (paylog_id == null) {
+            return;
+        }
+
+        var url = U("PyIndex","pay_reverse");
+        var options = {
+            'url': url,
+            'cache':false,
+            'data': {
+                'paylog_id': paylog_id,
+                'login_role_id':login_role_id
+            },
+            'success': function(data) {
+                if (data.code == 0) {
+                    pay_response(data.body);
+                }
+            }
+        };
+        $.ajax(options);
+    }
+
+    function pay_response(paylog) {
+        if (paylog.code == "125") {
+            return;
+        }
+        if (pay_channel_mode != "P") {
+            clearInterval(pay_query_interval);
+            $("#message").html(paylog.code_desc + "[" + paylog.code + "]");
+        }
+
+        if (paylog.code == "0") {
+            clearInterval(pay_query_interval);
+            if (pay_qrcode_interval) {
+                clearInterval(pay_qrcode_interval);
+            }
+            success_pay(paylog);
+        }
+    }
+
+    var pay_query_interval = null;
+    function pay_query() {
+        if (paylog_id == null) {
+            clearInterval(pay_query_interval);
+            return;
+        }
+
+        var url = U("PyIndex","pay_query");
+        var options = {
+            'url': url,
+            'cache':false,
+            'data': {
+                'paylog_id': paylog_id,
+                'login_role_id':login_role_id
+            },
+            'success': function(data) {
+                if (data.code == 0) {
+                    pay_response(data.body);
+                } else {
+                    $("#message").html(data.error);
+                    clearInterval(pay_query_interval);
+                }
+            },
+            'error':function(xhr,status,error) {
+                $("#message").html(status);
+                clearInterval(pay_query_interval);
+            }
+        };
+        $.ajax(options);
+    }
+
+    function pay_response_qrcode(paylog) {
+        if (paylog && paylog['qrcode']) {
+            var qrcode = "http://a.ayihui.cn/index.php?m=PyIndex&a=show_qucode&qrcode="+paylog['qrcode'];
+            $("#message").html('<img src="'+qrcode+'" width="100"/>');
+        }
+    }
+
+    var pay_qrcode_interval = null;
+    function pay_qrcode() {
+        if (paylog_id == null) {
+            clearInterval(pay_qrcode_interval);
+            return;
+        }
+
+        var url = U("PyIndex","pay_qrcode");
+        var options = {
+            'url': url,
+            'cache':false,
+            'data': {
+                'paylog_id': paylog_id,
+                'login_role_id':login_role_id
+            },
+            'success': function(data) {
+                if (data.code == 0) {
+                    pay_response_qrcode(data.body);
+                } else {
+                    clearInterval(pay_qrcode_interval);
+                }
+            },
+            'error':function(xhr,status,error) {
+                $("#message").html(status);
+                clearInterval(pay_qrcode_interval);
+            }
+        };
+        $.ajax(options);
+    }
+
+    function start_pay(auth_code) {
+        var url = U("PyIndex","pay");
+        var data = {
+            'total_fee': total_fee,
+            'market_id': market_id,
+            'pay_channel': pay_channel,
+            'pay_channel_mode': pay_channel_mode,
+            'terminal_no': terminal_no,
+            'login_role_id':login_role_id
+        };
+        if (auth_code) {
+            data['auth_code'] = auth_code;
+        }
+        var options = {
+            'url': url,
+            'data': data,
+            'cache':false,
+            'beforeSend':function(){
+                $("#message").html("正在提交支付...");
+            },
+            'success': function(data) {
+                if (data.code == 0) {
+                    $("#message").html(data.body.code_desc + "[" + data.body.code + "]");
+                    if (data.body.code == "0" || data.body.code == "125") {
+                        if (pay_channel_mode == "P") {
+                            pay_response_qrcode(data.body);
+                            setInterval(pay_qrcode, 3 * 60 * 1000);
+                        }
+                        query_pay_interval = setInterval(pay_query, 3000);
+                    }
+                    paylog_id = data.body.paylog_id;
+                } else {
+                    $("#message").html(data.error);
+                }
+            },
+            'error':function(xhr,status,error) {
+                $("#message").html(status);
+            }
+        }
+        $.ajax(options);
+    }
+
+    document.addEventListener("deviceready", function(){
+        if (!market_id || !login_role_id || !total_fee) {
+            finish_activity();
+            return;
+        }
+        if (pay_channel_mode == "P") {
+            start_pay(null);
+        } else {
+            cordova.exec(function(data){start_pay(data);}, function(){finish_activity();},"BabyPlugin", "scan_qrcode", []);
+        }
+    }, false);
+</script>

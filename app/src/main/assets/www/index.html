@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="format-detection" content="telephone=yes">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <title>应用</title>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="baby.js"></script>
+
+    <script type="text/javascript" src="js/zepto.min.js"></script>
+    <script type="text/javascript" src="js/frozen.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="css/frozen.css">
+    <link rel="stylesheet" href="fonts/iconfont.css"/>
+    <link rel="stylesheet" href="css/font.css"/>
+    <link rel="stylesheet" href="css/weui.min.css"/>
+    <link rel="stylesheet" href="css/jquery-weui.min.css"/>
+    <link rel="stylesheet" href="css/mui.css"/>
+    <link rel="stylesheet" href="css/animate.css"/>
+    <link type="text/css" rel="stylesheet" href="css/base.css">
+
+    <link rel="stylesheet" href="css/zdialog.css"/>
+    <script type="text/javascript" src="js/zdialog.js"></script>
+    <script>
+        (function (doc, win) {
+          var docEl = doc.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+            recalc = function () {
+              var clientWidth = docEl.clientWidth;
+              if (!clientWidth) return;
+              docEl.style.fontSize = 20 * (clientWidth / 320) + 'px';
+            };
+
+          if (!doc.addEventListener) return;
+          win.addEventListener(resizeEvt, recalc, false);
+          doc.addEventListener('DOMContentLoaded', recalc, false);
+        })(document, window);
+    </script>
+</head>
+
+<body ontouchstart>
+<header>
+    <div class="titlebar reverse" id="login_info">
+        <div class="search_box"><h1>公司员工：${name}</h1></div>
+        <div class="zhuxiaott"><a href="javascript:void(0);"  onclick="on_click_logout();">注销</a></div>
+        <a href="###" class="goback"></a>
+    </div>
+</header>
+<article style="padding-bottom: 54px;padding-top:54px;">
+    <div class="list-wrap">
+        <h4>新订单</h4>
+        <HR SIZE=5>
+        <ul class="app-list">
+            <li>
+                <div class="app-wrap">
+                    <a href="javascript:void(0);" class="category" category_id="2" key="49">
+                        <img src="images/yuesao.png"  class="iconfont"/>
+                        <span>月嫂</span>
+                    </a>
+                </div>
+
+            </li>
+            <li>
+                <div class="app-wrap">
+                    <a href="javascript:void(0);" class="category" category_id="3" key="50">
+                        <img src="images/yuersao.png"  class="iconfont"/>
+                        <span>育儿嫂</span>
+                    </a>
+                </div>
+
+            </li>
+            <li>
+                <div class="app-wrap">
+                    <a href="javascript:void(0);" class="category" category_id="11" key="51">
+                        <img src="images/manyuehan.png"  class="iconfont"/>
+                        <span>满月汗蒸</span>
+                    </a>
+                </div>
+
+            </li>
+            <li>
+                <div class="app-wrap">
+                    <a href="javascript:void(0);" class="category" category_id="10" key="52">
+                        <img src="images/chuman.png"  class="iconfont"/>
+                        <span>小儿推拿</span>
+                    </a>
+                </div>
+
+            </li>
+            <li>
+                <div class="app-wrap">
+                    <a href="javascript:void(0);" class="category" category_id="9" key="53">
+                        <img src="images/yuersao.png"  class="iconfont"/>
+                        <span>胎盘加工</span>
+                    </a>
+                </div>
+
+            </li>
+            <li>
+                <div class="app-wrap">
+                    <a href="javascript:void(0);" class="category" category_id="12" key="54">
+                        <img src="images/jinianpin.png"  class="iconfont"/>
+                        <span>出生纪念品</span>
+                    </a>
+                </div>
+
+            </li>
+        </ul>
+    </div>
+
+    <div class="list-wrap">
+        <h4>订单</h4>
+        <ul class="app-list">
+            <li>
+                <div class="app-wrap">
+                    <a href="javascript:void(0);" onclick="on_click_history();" key="55">
+                        <i class="iconfont">&#xe64b;</i>
+                        <span>历史订单</span>
+                    </a>
+                </div>
+
+            </li>
+        </ul>
+    </div>
+
+</article>
+
+</body>
+</html>
+<script id="login-info-tmpl" type="text/x-jquery-tmpl">
+<div class="search_box"><h1>公司员工：${name}</hl></div>
+<div class="zhuxiaott"><a href="javascript:void(0);"  onclick="on_click_logout();">注销</a></div>
+<a href="###" class="goback"></a>
+</script>
+
+
+<script>
+    $(function(){
+        $(".category").click(function(){
+            var category_id = $(this).attr("category_id");
+            cordova.exec(null, null, "BabyPlugin", "start_new_market", [category_id]);
+        });
+    });
+
+    function on_click_history() {
+        cordova.exec(null, null, "BabyPlugin", "list_market", []);
+    }
+
+    function on_click_logout() {
+        $.DialogByZ.Confirm({Title: "", Content: "确定要退出登录吗?",FunL:function(){
+            cordova.exec(null, null, "BabyPlugin", "action_logout", []);
+       },FunR:function(){$.DialogByZ.Close()}});
+    }
+
+    function on_click_setting() {
+        cordova.exec(null, null, "BabyPlugin", "action_setting", []);
+    }
+
+    document.addEventListener("deviceready", function(){
+        getLoginInfo(function(user){
+            $('#login_info').html($("#login-info-tmpl").tmpl(user));
+        });
+    }, false);
+
+    function on_exit() {
+        $.DialogByZ.Confirm({Title: "", Content: "确实退出吗?",FunL:function(){
+            finish_activity("cancel");
+       },FunR:function(){$.DialogByZ.Close()}});
+    }
+
+    $(document).keydown(function (event) {
+        if ($.DialogByZ.state) {
+            $(".zbox-popup-button[index_key='"+event.keyCode+"']").click();
+            return false;
+        } else {
+            $("a[key='"+event.keyCode+"']").click();
+        }
+    });
+</script>

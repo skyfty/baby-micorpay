@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/application_search_title_bg_color"
+        android:padding="10dp" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <com.bebo.sortlist.ClearEditText
+                    android:id="@+id/content"
+                    android:layout_width="fill_parent"
+                    android:layout_height="120dip"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/yuan_edit_bg"
+                    android:gravity="center_vertical"
+                    android:singleLine="false"
+                    android:textColor="@color/application_black"
+                    android:textColorHint="@color/application_deep_gray_black"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/ok_btn"
+                    android:layout_width="131dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="5dip"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/search_dialog_cancle_btn"
+                    android:padding="5dip"
+                    android:text="@string/ok"
+                    android:textColor="@color/white"
+                    android:textSize="17sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>

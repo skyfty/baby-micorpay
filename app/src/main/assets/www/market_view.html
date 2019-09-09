@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="baby.js"></script>
+
+    <link rel="stylesheet" href="fonts/iconfont.css"/>
+    <link rel="stylesheet" href="css/font.css"/>
+    <link rel="stylesheet" href="css/weui.min.css"/>
+    <link rel="stylesheet" href="css/jquery-weui.min.css"/>
+    <link rel="stylesheet" href="css/mui.css"/>
+    <link rel="stylesheet" href="css/animate.css"/>
+    <link rel="stylesheet" href="css/pages/market_view.css"/>
+
+    <link rel="stylesheet" href="css/zdialog.css"/>
+    <script type="text/javascript" src="js/zdialog.js"></script>
+
+    <script>(function (doc, win) {
+          var docEl = doc.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+            recalc = function () {
+              var clientWidth = docEl.clientWidth;
+              if (!clientWidth) return;
+              docEl.style.fontSize = 20 * (clientWidth / 320) + 'px';
+            };
+
+          if (!doc.addEventListener) return;
+          win.addEventListener(resizeEvt, recalc, false);
+          doc.addEventListener('DOMContentLoaded', recalc, false);
+        })(document, window);</script>
+</head>
+<body>
+
+<header style=" z-index:999;">
+    <div class="titlebar reverse">
+        <a href="javascript:void(0);" class="goback" onclick="on_back()">
+            <i class="iconfont">&#xe640;</i>
+        </a>
+        <h1>订单详情</h1>
+    </div>
+</header>
+
+<article style="bottom: 0;padding-bottom:70px;background:white" id="data">
+    <div class="no-data" style="text-align:center;">
+                <span>
+                    <i class="iconfont">&#xe613;</i>
+                </span>
+        <label id="message">查询中...</label>
+    </div>
+</article>
+<footer class="footer"  style="background:white">
+    <div class="button" id="footer_operator" style="padding-top:10px;display:none">
+        <div class="bd"  id="market_edit_div">
+            <a href="javascript:void(0);" onclick="on_edit();" id="edit_button"  class="weui_btn weui_btn_primary">编辑</a>
+        </div>
+        <div class="bd"  id="market_pay_div">
+            <a href="javascript:void(0);" onclick="on_pay();" id="pay_button" class="weui_btn weui_btn_primary">支付</a>
+        </div>
+        <div class="bd"  id="market_add_product_div">
+            <a href="javascript:void(0);" onclick="product_add();" id="add_product_button"  class="weui_btn weui_btn_primary">添加阿姨</a>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
+<script id="loading-tmpl" type="text/x-jquery-tmpl">
+    <div class="no-data" style="text-align:center;">
+        <span>
+            <i class="iconfont">&#xe613;</i>
+        </span>
+        <label id="message">查询中...</label>
+    </div>
+</script>
+<script id="market-info-tmpl" type="text/x-jquery-tmpl">
+
+    <ul class="xunjia-tab clearfix">
+        <li class="red">订单信息</li>
+    </ul>
+    <ul class="xunjia-box">
+        <li class="inner">
+            <div class="item-name">订单：</div>
+            <div class="item-value">${category_name}-${market_idcode}-${status_name}-${settle_status_name}</div>
+        </li>
+        <li class="inner">
+            <div class="item-name">客户：</div>
+            <div class="item-value">
+                ${customer_name} - ${customer_telephone}
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">服务时间：</div>
+            <div class="item-value">
+                ${start_time_show}至${end_time_show},共${sum_service_duration}天
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">预约时间：</div>
+            <div class="item-value">
+                ${demand_start_time_show}
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">订单金额：</div>
+            <div class="item-value">
+                ${sum_settle_price} 元
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">[付/未]金额：</div>
+            <div class="item-value">
+                ${deficit_price}/${surplus_price} 元
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">工资合计：</div>
+            <div class="item-value">
+                ${sum_salary}元
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">中介费合计：</div>
+            <div class="item-value">
+                ${sum_agency}元
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">促单费合计：</div>
+            <div class="item-value">
+                ${sum_urge_price}元
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">渠道费合计：</div>
+            <div class="item-value">
+                ${sum_channel_price}元
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">确认/待金额：</div>
+            <div class="item-value">
+                ${confirm_price}/${wait_confirm_price}元
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">冻结金额：</div>
+            <div class="item-value">
+                ${customer_earnest}元
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">利润/净利润：</div>
+            <div class="item-value">
+                ${gain}/${profit}元
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">结算天数：</div>
+            <div class="item-value">
+                ${sum_settle_duration}天
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">结算时间：</div>
+            <div class="item-value">
+                ${settle_date_show}
+            </div>
+        </li>
+        {{if description!=""}}
+        <li class="inner">
+            <div class="item-name">备注：</div>
+            <div class="item-value">
+                ${description}
+            </div>
+        </li>
+        {{/if}}
+    </ul>
+
+    {{each(i,product) products}}
+    <ul class="xunjia-tab clearfix">
+        <li class="green">服务阿姨</li>
+    </ul>
+
+     <ul class="xunjia-box">
+        <li class="inner">
+            <div class="item-name">阿姨：</div>
+            <div class="item-value">[${product.product_idcode}]${product.product_name} - ${product.service_status_id_show}</div>
+        </li>
+        <li class="inner">
+            <div class="item-name">服务时间：</div>
+            <div class="item-value">
+                ${product.real_start_time_show} 至  ${product.real_end_time_show}, 共${product.service_duration}天
+            </div>
+        </li>
+        {{if product.settle_duration!=""}}
+        <li class="inner">
+            <div class="item-name">结算天数：</div>
+            <div class="item-value">
+                ${product.settle_duration}天
+            </div>
+        </li>
+        {{/if}}
+        {{if product.service_price!=""}}
+        <li class="inner">
+            <div class="item-name">服务价格：</div>
+            <div class="item-value">
+                ${product.service_price}元
+            </div>
+        </li>
+        {{/if}}
+        <li class="inner">
+            <div class="item-name">订单金额：</div>
+            <div class="item-value green">
+                ${product.price}元
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">结算金额：</div>
+            <div class="item-value green">
+                ${product.settle_price}元
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">合计金额：</div>
+            <div class="item-value green">
+                ${product.settle_price}元
+            </div>
+        </li>
+        {{if product.salary_settle_time!=""}}
+        <li class="inner">
+            <div class="item-name">结算时间：</div>
+            <div class="item-value green">
+                ${product.salary_settle_time}&nbsp;
+            </div>
+        </li>
+        {{/if}}
+
+        {{if product.agency!=""}}
+        <li class="inner">
+            <div class="item-name">中介费：</div>
+            <div class="item-value green">
+                ${product.agency}元
+            </div>
+        </li>
+        {{/if}}
+        {{if product.agency_scale!=""}}
+        <li class="inner">
+            <div class="item-name">中介费比例：</div>
+            <div class="item-value green">
+                ${product.agency_scale}&nbsp;
+            </div>
+        </li>
+        {{/if}}
+        {{if product.recess_day!=""}}
+        <li class="inner">
+            <div class="item-name">休息天数：</div>
+            <div class="item-value green">
+                ${product.recess_day}天
+            </div>
+        </li>
+        {{/if}}
+        {{if product.job_number!=""}}
+        <li class="inner">
+            <div class="item-name">派工单号：</div>
+            <div class="item-value green">
+                ${product.job_number}&nbsp;
+            </div>
+        </li>
+        {{/if}}
+        <li class="inner no-padding">
+            <div>
+                <a href="javascript:void(0);" onclick="product_delete(${product.market_product_id})" style="width:130px"   id="market_proudct_delete_div" class="weui_btn weui_btn_mini weui_btn_warn">删除</a>
+                <a href="javascript:void(0);"  onclick="product_edit(${product.market_product_id})"  id="market_product_div"  class="weui_btn weui_btn_mini weui_btn_warn">编辑</a>
+            </div>
+        </li>
+    </ul>
+        {{/each}}
+</script>
+
+<script>
+    var login_role_id = getQueryString("login_role_id");
+    var market_id = getQueryString("id");
+
+    function on_back() {
+        finish_activity("back");
+    }
+
+    $(document).keydown(function (event) {
+        if ($.DialogByZ.state) {
+            $(".zbox-popup-button[index_key='"+event.keyCode+"']").click();
+            return false;
+        } else if(event.keyCode == 13 || event.keyCode == 50) {
+            $("#pay_button").click();
+        } else if(event.keyCode == 49) {
+            $("#edit_button").click();
+        } else if(event.keyCode == 51) {
+            $("#add_product_button").click();
+        }
+    });
+
+
+    function on_edit() {
+        cordova.exec(function(data){
+            assign_market_info(JSON.parse(data));
+        },null, "BabyPlugin", "edit_market", [market_id ]);
+    }
+
+    function on_pay() {
+        cordova.exec(function(data){
+            refresh_market_info(market_id);
+        },null, "BabyPlugin", "pay_market", [market_id ]);
+    }
+
+    function product_add() {
+        cordova.exec(function(data){
+            assign_market_info(JSON.parse(data));
+        }, null, "BabyPlugin", "market_add_product", [ market_id ]);
+    }
+
+    function product_edit(market_product_id) {
+        cordova.exec(function(data){
+            assign_market_info(JSON.parse(data));
+        }, null, "BabyPlugin", "market_edit_product", [ market_id,market_product_id ]);
+    }
+
+    function product_delete(market_product_id) {
+        $.DialogByZ.Confirm({Title: "", Content: "确定要删除吗?",FunL:function(){
+            $.DialogByZ.Close();
+            var url = U("PyMarket","product_delete");
+            var options = {
+                'url': url,
+                'cache':false,
+                'data': {
+                    'id':market_product_id,
+                    'market_id':market_id,
+                    'login_role_id':login_role_id
+                },
+                beforeSend:function(){
+                    $('#data').html($("#loading-tmpl").tmpl());
+                },
+                'success': function(data) {
+                    if (data.code == 0) {
+                        assign_market_info(data.body);
+                    } else {
+                        $.DialogByZ.Alert({Title: "", Content: data.error,FunL:function(){
+                            $.DialogByZ.Close();
+                        }});
+                    }
+                },
+                'error':function(xhr,status,error) {
+                    $.DialogByZ.Alert({Title: "", Content: status,FunL:function(){
+                        $.DialogByZ.Close();
+                    }});
+                }
+            };
+            $.ajax(options);
+       },FunR:function(){$.DialogByZ.Close()}});
+    }
+
+    function assign_market_info(market){
+        $('#data').html($("#market-info-tmpl").tmpl(market));
+        if (market['disabled_edit'] == true) {
+            $("#market_edit_div").hide();
+            $("#market_add_product_div").hide();
+            $("#market_pay_div").hide();
+            if (market['settle_state'] >= 917) {
+                $("#market_product_div").hide();
+                $("#market_proudct_delete_div").hide();
+            }
+        }
+        market_id = market.market_id;
+        $("#footer_operator").show();
+    }
+
+    function refresh_market_info(id) {
+        var url = U("PyMarket","view");
+        var options = {
+            'url': url,
+            'data': {
+                'id':id,
+                'login_role_id':login_role_id
+            },
+            'success': function(data) {
+                if (data.code == 0) {
+                    assign_market_info(data.body);
+                } else {
+                   $.DialogByZ.Alert({Title: "", Content: data.error,FunL:function(){
+                        $.DialogByZ.Close();
+                        finish_activity();
+                   }});
+                }
+            },
+            'error':function(xhr,status,error) {
+                $.DialogByZ.Alert({Title: "", Content: status,FunL:function(){
+                    $.DialogByZ.Close();
+                    finish_activity();
+                }});
+            }
+        };
+        $.ajax(options);
+    }
+
+    function init_market(market_info){
+        $(function(){
+            if (market_info!="") {
+                assign_market_info(JSON.parse(market_info));
+            } else {
+                refresh_market_info(market_id);
+            }
+        });
+    }
+
+
+</script>

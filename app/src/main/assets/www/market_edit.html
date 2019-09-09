@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>Hello World</title>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.form.js"></script>
+    <script type="text/javascript" src="js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="js/messages_zh.min.js"></script>
+    <script type="text/javascript" src="baby.js"></script>
+
+    <link rel="stylesheet" href="fonts/iconfont.css"/>
+    <link rel="stylesheet" href="css/font.css"/>
+    <link rel="stylesheet" href="css/weui.min.css"/>
+    <link rel="stylesheet" href="css/jquery-weui.min.css"/>
+    <link rel="stylesheet" href="css/mui.css"/>
+    <link rel="stylesheet" href="css/animate.css"/>
+    <link rel="stylesheet" href="css/pages/market_edit.css"/>
+    <link rel="stylesheet" href="css/frozen.css"/>
+
+    <link rel="stylesheet" href="css/zdialog.css"/>
+    <script type="text/javascript" src="js/zdialog.js"></script>
+
+    <script>(function (doc, win) {
+          var docEl = doc.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+            recalc = function () {
+              var clientWidth = docEl.clientWidth;
+              if (!clientWidth) return;
+              docEl.style.fontSize = 20 * (clientWidth / 320) + 'px';
+            };
+
+          if (!doc.addEventListener) return;
+          win.addEventListener(resizeEvt, recalc, false);
+          doc.addEventListener('DOMContentLoaded', recalc, false);
+        })(document, window);</script>
+</head>
+<body>
+<header>
+    <div class="titlebar reverse">
+        <a href="javascript:void(0);"  onclick="on_back()">
+            <i class="iconfont">&#xe640;</i>
+        </a>
+        <h1>订单</h1>
+    </div>
+</header>
+<form id="form" method="get" action="">
+    <input type="hidden" id="market_id" name="market_id"/>
+    <input type="hidden" id="category_id" name="category_id"/>
+<article style="padding-bottom: 54px;padding-top:54px;">
+    <ul class="xunjia-box">
+        <li class="inner">
+            <div class="item-name">订单类型：</div>
+            <div class="item-value">
+                <div class="input-wrap">
+                    <input type="text" readonly="readonly" id="category_name" placeholder="" style="width:100px"/>
+                </div>
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">客户：</div>
+            <div class="item-value">
+                <div class="input-wrap">
+                    <input type="hidden" id="customer_id" name="customer_id"/>
+                    <input type="text" readonly="readonly" id="customer_name" style="width:100px" placeholder="客户名称" onclick="on_select_customer();" required/>
+                    <label for="customer_name"></label>
+                </div>
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">手机：</div>
+            <div class="item-value">
+                <div class="input-wrap">
+                    <input type="tel" id="customer_telephone" placeholder="手机" style="width:100px" name="customer_telephone" required/><label style="padding-left:10px;color:red" for="customer_telephone"></label>
+                </div>
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">约定服务时间：</div>
+            <div class="item-value">
+                <div class="input-wrap">
+                    <input type="date" id="demand_start_time" placeholder="预约时间" style="width:110px"  name="demand_start_time" required/><label style="padding-left:10px;color:red" for="demand_start_time"></label>
+                </div>
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">周期或次数：</div>
+            <div class="item-value">
+                <div class="input-wrap">
+                    <input type="number" id="period" placeholder="服务天数" style="width:60px"  name="period" required/><label style="padding-left:10px;color:red" for="period"></label>
+                </div>
+            </div>
+        </li>
+        <li class="inner">
+            <div class="item-name">服务价格：</div>
+            <div class="item-value">
+                <div class="select-wrap">
+                    <input type="number" id="money" placeholder="服务价格" style="width:100px"   name="money" required/><label style="padding-left:10px;color:red" for="money"></label>
+                </div>
+            </div>
+        </li>
+        <li class="inner innerP">
+            <div class="item-name">备注：</div>
+            <div class="item-value">
+                <div class="p-wrap">
+                    <textarea id="description" name="description" placeholder="备注"></textarea>
+                </div>
+            </div>
+        </li>
+    </ul>
+</article>
+</form>
+
+<footer class="footer"  style="background:white;">
+    <div class="button">
+        <div class="bd">
+            <a href="javascript:void(0);" onclick="on_save();" id="submit_button" class="weui_btn weui_btn_primary">提交</a>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
+
+<script>
+    var login_role_id = getQueryString("login_role_id");
+    var market_id = getQueryString("id");
+
+$.validator.setDefaults({
+    submitHandler: function() {
+        var url = U("PyMarket","update");
+        var data = $("form").serialize() + "&login_role_id="+getQueryString("login_role_id");
+        var options = {
+            type: "POST",
+            'cache':false,
+            'url': url,
+            'data': data,
+            'beforeSend':function(){
+                showProgressDialog("提交中...");
+            },
+            'success': function(data) {
+                if (data.code == 0) {
+                    cordova.exec(null, null, "BabyPlugin", "complete_market", [data.body,(market_id?"edit":"new")]);
+                } else {
+                    $.DialogByZ.Alert({Title: "", Content: data.error,FunL:function(){
+                        $.DialogByZ.Close();
+                    }});
+                }
+            },
+            'error':function(xhr,status,error) {
+                $.DialogByZ.Alert({Title: "", Content: status,FunL:function(){
+                    $.DialogByZ.Close();
+                }});
+            },
+            'complete':function(){
+                hideProgressDialog();
+            }
+        };
+        $.ajax(options);
+    }
+});
+$().ready(function() {
+    $("#form").validate();
+});
+</script>
+
+<script>
+
+    function on_save() {
+        $("#form").submit();
+    }
+
+    function on_back() {
+	   $.DialogByZ.Confirm({Title: "", Content: "确定要未保存退出吗?",FunL:function(){
+	        finish_activity("back");
+	   },FunR:function(){$.DialogByZ.Close()}})
+    }
+
+    $(document).keydown(function (event) {
+        if ($.DialogByZ.state) {
+            $(".zbox-popup-button[index_key='"+event.keyCode+"']").click();
+            return false;
+        } else if(event.keyCode == 13) {
+            $("#submit_button").click();
+        }
+    });
+
+    function on_select_customer() {
+        select_customer(function(data) {
+            if (data.code == 0) {
+                var customer = data.body;
+                $("#customer_id").val(customer.customer_id);
+                $("#customer_name").val(customer.name);
+                $("#customer_telephone").val(customer.telephone);
+            }
+        });
+    }
+
+    function assign_market_info(market) {
+        $("#market_id").val(market.market_id);
+        $("#category_id").val(market.category_id);
+        $("#customer_id").val(market.customer_id);
+        $("#customer_name").val(market.customer_name);
+        $("#customer_telephone").val(market.customer_telephone);
+        $("#demand_start_time").val(market.demand_start_time_show);
+        $("#period").val(market.period);
+        $("#money").val(market.money);
+        $("#description").val(market.description);
+        $("#category_name").val(market.category_name);
+    }
+
+    function init_category(category_id, category_name) {
+        $("#category_id").val(category_id);
+        $("#category_name").val(category_name);
+    }
+
+    document.addEventListener("deviceready", function(){
+        if (market_id) {
+            var url = U("PyMarket","getinfo");
+            var options = {
+                'url': url,
+                'cache':false,
+                'data': {
+                    'id':market_id,
+                    "login_role_id":getQueryString("login_role_id")
+                },
+                'beforeSend':function(){
+                    showProgressDialog("请等待...");
+                },
+                'success': function(data) {
+                    if (data.code == 0) {
+                        assign_market_info(data.body);
+                    } else {
+                        finish_activity();
+                    }
+                },
+                'error':function(xhr,status,error) {
+                    finish_activity();
+                },
+                'complete':function(){
+                    hideProgressDialog();
+                }
+            };
+            $.ajax(options);
+        }
+    });
+</script>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <title>Hello World</title>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.serializejson.min.js"></script>
+    <script type="text/javascript" src="baby.js"></script>
+    <script src="js/zepto.min.js"></script>
+    <script src="js/frozen.js"></script>
+    <link rel="stylesheet" href="css/base.css"/>
+    <link rel="stylesheet" href="css/frozen.css">
+
+    <style>
+        .ui-select input[type=date] {
+            -webkit-appearance: none;
+            border: 0;
+            background: 0 0;
+            width: 100%;
+            padding-right: 14px
+        }
+    </style>
+
+</head>
+<body>
+<section class="ui-container">
+<form id="form" method="post">
+    <section class="ui-input-wrap ui-border-t">
+        <div class="ui-input ui-border-radius">
+            <input type="search"  id="keyword" name="search[value]" value="" placeholder="关键字">
+        </div>
+        <button class="ui-btn" onclick="complete();">搜索</button>
+    </section>
+
+    <div class="ui-form ui-border-t">
+        <div class="ui-form-item ui-border-b">
+            <label>创建时间</label>
+            <div class="ui-select">
+                <select name="byd">
+                    <option value=""  selected="selected">全部</option>
+                    <option value="today" >今日新建</option>
+                    <option value="fmonth">上月新建</option>
+                    <option value="month">本月新建</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="ui-form-item ui-border-b">
+            <label>结算时间</label>
+            <div class="ui-select">
+                <select name="bysd">
+                    <option value=""  selected="selected">全部</option>
+                    <option value="today" >今日结算</option>
+                    <option value="fmonth">上月结算</option>
+                    <option value="month">本月结算</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="ui-form-item ui-border-b">
+            <label>类别</label>
+            <div class="ui-select">
+                <select name="category_id">
+                    <option value=""  selected="selected">全部</option>
+                    <option value="2" >月嫂</option>
+                    <option value="3">育儿嫂</option>
+                    <option value="5">催乳</option>
+                    <option value="11">满月汗蒸</option>
+                    <option value="10">小儿推拿</option>
+                    <option value="9">胎盘加工</option>
+                    <option value="12">出生纪念品</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="ui-form-item ui-border-b">
+            <label>运行状态</label>
+            <div class="ui-select">
+                <select name="asid">
+                    <option value=""  selected="selected">全部</option>
+                    <option value="3">已完成</option>
+                    <option value="2">服务中</option>
+                    <option value="4">临近上户</option>
+                    <option value="5">临近结束</option>
+                    <option value="1">待服务</option>
+                    <option value="0">已撤销</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="ui-form-item ui-border-b">
+            <label>结算状态</label>
+            <div class="ui-select">
+                <select name="ssids">
+                    <option value=""  selected="selected">全部</option>
+                    <option value="913" >未支付</option>
+                    <option value="914">未付清</option>
+                    <option value="915">待确认付清</option>
+                    <option value="916">已付清</option>
+                    <option value="917">可结算</option>
+                    <option value="918">已结算</option>
+                    <option value="919">结算退回</option>
+                    <option value="913,914,915,916,917,919">未结算</option>
+                </select>
+            </div>
+        </div>
+
+        <!--<div class="ui-form-item  ui-border-b">-->
+            <!--<label>开始时间</label>-->
+            <!--<div class="ui-select-group">-->
+                <!--<div class="ui-select"><input type="date"  name="start_time[value][0]"/></div>-->
+                <!--<div class="ui-select"><input type="date" name="start_time[value][1]"/></div>-->
+            <!--</div>-->
+        <!--</div>-->
+
+        <!--<div class="ui-form-item ui-border-b">-->
+            <!--<label>结束时间</label>-->
+            <!--<div class="ui-select">-->
+                <!--<input type="date" style="width:90px"  name="end_time[value][0]"/> - <input type="date" style="width:90px"  name="end_time[value][1]"/>-->
+            <!--</div>-->
+        <!--</div>-->
+    </div>
+
+</form>
+</section>
+</body>
+</html>
+
+
+<script>
+    function complete() {
+        var search_param = $("form").serializeJSON();
+        cordova.exec(null, null, "BabyPlugin", "complete_search_options", [JSON.stringify(search_param)]);
+    }
+</script>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        <title>Hello World</title>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
+        <script type="text/javascript" src="baby.js"></script>
+        <link rel="stylesheet" href="fonts/iconfont.css"/>
+        <link rel="stylesheet" href="css/font.css"/>
+        <link rel="stylesheet" href="css/mui.css"/>
+        <link rel="stylesheet" href="css/weui.min.css"/>
+        <link rel="stylesheet" href="css/jquery-weui.min.css"/>
+        <link rel="stylesheet" href="css/mui.css"/>
+        <link rel="stylesheet" href="css/animate.css"/>
+        <link rel="stylesheet" href="css/pages/prepay.css"/>
+
+        <link rel="stylesheet" href="css/zdialog.css"/>
+        <script type="text/javascript" src="js/zdialog.js"></script>
+
+        <script>(function (doc, win) {
+          var docEl = doc.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+            recalc = function () {
+              var clientWidth = docEl.clientWidth;
+              if (!clientWidth) return;
+              docEl.style.fontSize = 20 * (clientWidth / 320) + 'px';
+            };
+
+          if (!doc.addEventListener) return;
+          win.addEventListener(resizeEvt, recalc, false);
+          doc.addEventListener('DOMContentLoaded', recalc, false);
+        })(document, window);</script>
+    </head>
+    <body>
+    <header>
+        <div class="titlebar reverse">
+            <h1>正在支付</h1>
+        </div>
+    </header>
+    <article>
+        <div class="no-data" style="text-align:center">
+                <span>
+                    <i class="iconfont">&#xe620;</i>
+                </span>
+            <label id="message">启动支付...</label>
+        </div>
+        <div class="button">
+            <div class="bd">
+                <a id="cancel_btn" href="javascript:void(0);" onclick="on_cancel_pay();" class="weui_btn weui_btn_primary">取消支付</a>
+            </div>
+        </div>
+    </article>
+
+    </body>
+</html>
+
+
+<script>
+    var market_id = getQueryString("market_id");
+    var total_fee = getQueryString("total_fee");
+    var login_role_id = getQueryString("login_role_id");
+
+    function on_paystate(result) {
+        var json = JSON.parse(result);
+        $("#message").html(json.RespDesc + "["+json.RespCode+"]");
+    }
+
+    $(document).keydown(function (event) {
+        if ($.DialogByZ.state) {
+            $(".zbox-popup-button[index_key='"+event.keyCode+"']").click();
+            return false;
+        } else if(event.keyCode == 27) {
+            $("#cancel_btn").click();
+        }
+    });
+
+    function on_cancel_pay() {
+        $.DialogByZ.Confirm({Title: "", Content: "确实要取消支付吗?",FunL:function(){
+            finish_activity("cancel");
+       },FunR:function(){$.DialogByZ.Close()}});
+    }
+
+    document.addEventListener("deviceready", function(){
+        cordova.exec(null, null, "BabyPlugin", "scan_cardpay", []);
+    }, false);
+</script>

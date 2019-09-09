@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
+
+    <script type="text/javascript" src="baby.js"></script>
+
+    <link rel="stylesheet" href="fonts/iconfont.css"/>
+    <link rel="stylesheet" href="css/font.css"/>
+    <link rel="stylesheet" href="css/weui.min.css"/>
+    <link rel="stylesheet" href="css/jquery-weui.min.css"/>
+    <link rel="stylesheet" href="css/mui.css"/>
+    <link rel="stylesheet" href="css/animate.css"/>
+    <link rel="stylesheet" href="css/pages/choose.css"/>
+
+
+    <script>(function (doc, win) {
+          var docEl = doc.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+            recalc = function () {
+              var clientWidth = docEl.clientWidth;
+              if (!clientWidth) return;
+              docEl.style.fontSize = 20 * (clientWidth / 320) + 'px';
+            };
+
+          if (!doc.addEventListener) return;
+          win.addEventListener(resizeEvt, recalc, false);
+          doc.addEventListener('DOMContentLoaded', recalc, false);
+        })(document, window);</script>
+</head>
+<body>
+
+<header style=" z-index:999;">
+    <div class="titlebar reverse">
+        <a href="javascript:void(0);" onclick="on_back()">
+            <i class="iconfont">&#xe640;</i>
+        </a>
+        <h1>历史订单</h1>
+    </div>
+</header>
+
+<article style="bottom: 54px;">
+    <div class="weui_search_bar" id="search_bar">
+        <form class="weui_search_outer">
+            <label class="weui_search_text" id="search_text" onclick="on_search();">
+                <span>搜索</span>
+                <i class="weui_icon_search"></i>
+            </label>
+        </form>
+        <a href="javascript:" class="weui_search_cancel" id="search_cancel" style="display:block" onclick="clear_search();">全部</a>
+    </div>
+    <div id="list">
+        <div class="no-data" style="text-align:center;">
+                <span>
+                    <i class="iconfont">&#xe613;</i>
+                </span>
+            <label id="message">查询中...</label>
+        </div>
+    </div>
+    <div class="button" style="padding-top:10px;display:none"  id="footer_operator">
+        <div class="bd" style="float:left">
+            <a href="javascript:void(0);" onclick="on_page(-1);" class="weui_btn weui_btn_warn">上一页</a>
+        </div>
+        <div class="bd">
+            <a href="javascript:void(0);" onclick="on_page(1);" class="weui_btn weui_btn_warn">下一页</a>
+        </div>
+    </div>
+</article>
+<footer>
+
+</footer>
+
+</body>
+</html>
+
+<script id="market-info-tmpl" type="text/x-jquery-tmpl">
+{{each(i,market) data}}
+
+<div class="weui_cells weui_cells_access animated fadeInRight">
+    <a class="weui_cell box" href="javascript:;" onclick="on_click_show_business(${market.market_id});">
+        <div class="weui_cell_bd weui_cell_primary">
+            <p><span class="phone">${market.idcode} -${market.channel_role_model_show} </span><span class="green"> ${market.status_name} - ${market.settle_status_show} - ${market.evaluate_state}</span><span class="order"></span></p>
+            <p><span class="factory-name">客户：[${market.customer_idcode}] ${market.customer_name}</span></p>
+            <p><span class="factory-name">类别：${market.category_name} - ${market.service_product_show}</span></p>
+            <p><span class="factory-name">订单金额/未付：${market.sum_settle_price} / ${market.surplus_price}元</span></p>
+            <p><span class="factory-name">服务时间：${market.start_time_show} - ${market.end_time_show} 共 ${market.period}天/次</span></p>
+        </div>
+    </a>
+</div>
+
+{{/each}}
+</script>
+
+<script id="loading-tmpl" type="text/x-jquery-tmpl">
+    <div class="no-data" style="text-align:center;">
+        <span>
+            <i class="iconfont">&#xe613;</i>
+        </span>
+        <label id="message">查询中...</label>
+    </div>
+</script>
+<script>
+
+    var login_role_id = getQueryString("login_role_id");
+    var must_search ={};
+    var search = {};
+    var liststart = 0;
+    var listpages = 0;
+
+    function on_back() {
+        finish_activity("back");
+    }
+    function on_page(start) {
+        if (start > 0) {
+            liststart = Math.min(liststart+1, listpages);
+        } else {
+            liststart = Math.max(liststart-1, 0);
+        }
+        refresh_list(search, liststart);
+    }
+
+    function clear_search() {
+        refresh_list(must_search, liststart = 1);
+    }
+
+    function on_search() {
+        cordova.exec(function(data){
+            search = $.extend({}, JSON.parse(data), must_search);
+            refresh_list(search, liststart = 0);
+        }, null, "BabyPlugin", "search_market_options", []);
+    }
+
+    function on_click_show_business(market_id) {
+        cordova.exec(null, null, "BabyPlugin", "view_market", [market_id]);
+    }
+
+    function refresh_list(data, start) {
+        data['start'] = start;
+        data['login_role_id'] = login_role_id;
+        var url = U("PyMarket","index");
+        var options = {
+            'cache':false,
+            'url': url,
+            'data':data,
+            'success': function(data) {
+                if (data && data.total > 0) {
+                    listpages = data.pages - 1;
+                    $('#list').html($("#market-info-tmpl").tmpl(data));
+                } else {
+                    listpages = 0;
+                    $('#list').html("");
+                }
+                $("#footer_operator").show();
+            },
+            beforeSend:function(){
+                $('#list').html($("#loading-tmpl").tmpl());
+            },
+            'error':function(xhr,status,error) {
+                alert(status);
+            },
+        };
+        $.ajax(options);
+    }
+
+    function deviceready(param) {
+        setTimeout(function(){
+            refresh_list({}, liststart = 0);
+        }, 100);
+    }
+</script>

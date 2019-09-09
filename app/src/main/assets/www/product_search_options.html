@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <title>Hello World</title>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.serializejson.min.js"></script>
+    <script type="text/javascript" src="baby.js"></script>
+    <script src="js/zepto.min.js"></script>
+    <script src="js/frozen.js"></script>
+    <link rel="stylesheet" href="css/base.css"/>
+    <link rel="stylesheet" href="css/frozen.css">
+
+</head>
+<body>
+<section class="ui-container">
+    <form id="form" method="post">
+        <section class="ui-input-wrap ui-border-t">
+            <div class="ui-input ui-border-radius">
+                <input type="search"  id="keyword" name="search[value]" value="" placeholder="关键字">
+            </div>
+            <button class="ui-btn" onclick="complete();">搜索</button>
+        </section>
+
+        <div class="ui-form ui-border-t">
+            <div class="ui-form-item ui-border-b">
+                <label>创建时间</label>
+                <div class="ui-select">
+                    <select name="byd">
+                        <option value=""  selected="selected">全部</option>
+                        <option value="today" >今日新建</option>
+                        <option value="fmonth">上月新建</option>
+                        <option value="month">本月新建</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui-form ui-border-t">
+            <div class="ui-form-item ui-border-b">
+                <label>岗位状态</label>
+                <div class="ui-select">
+                    <select name="station_state">
+                        <option value=""  selected="selected">全部</option>
+                        <option value="在编" >在编</option>
+                        <option value="不在编">不在编</option>
+                        <option value="请长假">请长假</option>
+                        <option value="请短假">请短假</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui-form ui-border-t">
+            <div class="ui-form-item ui-border-b">
+                <label>工作状态</label>
+                <div class="ui-select">
+                    <select name="workstate_id">
+                        <option value=""  selected="selected">全部</option>
+                        <option value="面试" >面试</option>
+                        <option value="长假">长假</option>
+                        <option value="短假">短假</option>
+                        <option value="排岗">排岗</option>
+                        <option value="待岗">待岗</option>
+                        <option value="上岗">上岗</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</section>
+</body>
+</html>
+
+
+<script>
+    function complete() {
+        var search_param = $("form").serializeJSON();
+        cordova.exec(null, null, "BabyPlugin", "complete_search_options", [JSON.stringify(search_param)]);
+    }
+</script>

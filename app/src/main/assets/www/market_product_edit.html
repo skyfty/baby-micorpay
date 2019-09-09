@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <title>Hello World</title>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.form.js"></script>
+    <script type="text/javascript" src="js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="js/messages_zh.min.js"></script>
+    <script type="text/javascript" src="js/moment.min.js"></script>
+    <script type="text/javascript" src="baby.js"></script>
+
+    <link rel="stylesheet" href="fonts/iconfont.css"/>
+    <link rel="stylesheet" href="css/font.css"/>
+    <link rel="stylesheet" href="css/weui.min.css"/>
+    <link rel="stylesheet" href="css/jquery-weui.min.css"/>
+    <link rel="stylesheet" href="css/mui.css"/>
+    <link rel="stylesheet" href="css/animate.css"/>
+    <link rel="stylesheet" href="css/pages/market_edit.css"/>
+    <link rel="stylesheet" href="css/zdialog.css"/>
+    <script type="text/javascript" src="js/zdialog.js"></script>
+    <script>(function (doc, win) {
+          var docEl = doc.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+            recalc = function () {
+              var clientWidth = docEl.clientWidth;
+              if (!clientWidth) return;
+              docEl.style.fontSize = 20 * (clientWidth / 320) + 'px';
+            };
+
+          if (!doc.addEventListener) return;
+          win.addEventListener(resizeEvt, recalc, false);
+          doc.addEventListener('DOMContentLoaded', recalc, false);
+        })(document, window);</script>
+</head>
+<body>
+
+<header>
+    <div class="titlebar reverse">
+        <a href="javascript:void(0);"  onclick="on_back()">
+            <i class="iconfont">&#xe640;</i>
+        </a>
+        <h1>新建/编辑阿姨</h1>
+    </div>
+</header>
+
+<form id="form" method="get" action="">
+    <input type="hidden" id="market_id" name="market_id"/>
+    <input type="hidden" id="market_product_id" name="market_product_id"/>
+    <article style="padding-bottom: 54px;padding-top:54px;">
+        <ul class="xunjia-box">
+            <li class="inner">
+                <div class="item-name">服务阿姨：</div>
+                <div class="item-value">
+                    <div class="input-wrap">
+                        <input type="hidden" id="product_id" name="product_id"/>
+                        <input style="width:140px" placeholder="服务阿姨" type="text" id="product_name" readonly="readonly"  onclick="on_select_product();" required/><label style="padding-left:10px;color:red" for="product_name"></label>
+                    </div>
+                </div>
+            </li>
+            <li class="inner">
+                <div class="item-name">开始时间：</div>
+                <div class="item-value">
+                    <div class="input-wrap">
+                        <input type="date" id="real_start_time" style="width:100px"  name="real_start_time" required onchange="on_real_start_time_picked();"/><label style="padding-left:10px;color:red" for="real_start_time"></label>
+                    </div>
+                </div>
+            </li>
+            <li class="inner">
+                <div class="item-name">结束时间：</div>
+                <div class="item-value">
+                    <div class="input-wrap">
+                        <input type="date" id="real_end_time" style="width:100px"  name="real_end_time" required  onchange="on_recess_day_change();"/><label style="padding-left:10px;color:red" for="real_end_time"></label>
+                    </div>
+                </div>
+            </li>
+            <li class="inner">
+                <div class="item-name">休息天数：</div>
+                <div class="item-value">
+                    <div class="input-wrap">
+                        <input type="number"  style="width:60px" id="recess_day" placeholder="休息天数"  name="recess_day" required/><label style="padding-left:10px;color:red" for="recess_day"></label>
+                    </div>
+                </div>
+            </li>
+            <li class="inner">
+                <div class="item-name">服务天数：</div>
+                <div class="item-value">
+                    <div class="select-wrap">
+                        <input type="number"  style="width:60px"  id="service_duration" placeholder="服务天数"  name="service_duration" required/><label style="padding-left:10px;color:red" for="service_duration"></label>
+                    </div>
+                </div>
+            </li>
+            <li class="inner">
+                <div class="item-name">结算天数：</div>
+                <div class="item-value">
+                    <div class="select-wrap">
+                        <input type="number" style="width:60px"  id="settle_duration" placeholder="结算天数"  name="settle_duration" required/><label style="padding-left:10px;color:red" for="settle_duration"></label>
+                    </div>
+                </div>
+            </li>
+            <li class="inner">
+                <div class="item-name">结算金额：</div>
+                <div class="item-value">
+                    <div class="select-wrap">
+                        <input type="number"  style="width:100px" id="settle_price" placeholder="结算金额"  name="settle_price" required/><label style="padding-left:10px;color:red" for="settle_price"></label>
+                    </div>
+                </div>
+            </li>
+            <li class="inner">
+                <div class="item-name">服务价格：</div>
+                <div class="item-value">
+                    <div class="select-wrap">
+                        <input type="number" style="width:100px"  id="service_price" placeholder="服务价格"  name="service_price" required/><label style="padding-left:10px;color:red" for="service_price"></label>
+                    </div>
+                </div>
+            </li>
+            <li class="inner">
+                <div class="item-name">订单金额：</div>
+                <div class="item-value">
+                    <div class="select-wrap">
+                        <input type="number" style="width:100px"   id="price" placeholder="订单金额"  name="price" required/><label style="padding-left:10px;color:red" for="price"></label>
+                    </div>
+                </div>
+            </li>
+            <li class="inner">
+                <div class="item-name">中介费比例：</div>
+                <div class="item-value">
+                    <div class="select-wrap">
+                        <input type="number" style="width:100px"  id="agency_scale" placeholder="中介费比例"  name="agency_scale" required/><label style="padding-left:10px;color:red" for="agency_scale"></label>
+                    </div>
+                </div>
+            </li>
+            <li class="inner">
+                <div class="item-name">中介费：</div>
+                <div class="item-value">
+                    <div class="select-wrap">
+                        <input type="number" style="width:100px"  id="agency" placeholder="中介费"  name="agency" required/><label style="padding-left:10px;color:red" for="agency"></label>
+                    </div>
+                </div>
+            </li>
+            <li class="inner">
+                <div class="item-name">工资：</div>
+                <div class="item-value">
+                    <div class="select-wrap">
+                        <input type="number" style="width:100px"  id="salary" placeholder="工资"  name="salary" required/><label style="padding-left:10px;color:red" for="salary"></label>
+                    </div>
+                </div>
+            </li>
+            <li class="inner innerP">
+                <div class="item-name">备注：</div>
+                <div class="item-value">
+                    <div class="p-wrap">
+                        <textarea id="description" name="description" placeholder="备注"></textarea>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </article>
+</form>
+<footer class="footer"  style="background:white;">
+    <div class="button">
+        <div class="bd">
+            <a href="javascript:void(0);" onclick="on_save();" id="submit_button" class="weui_btn weui_btn_primary">提交</a>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
+
+
+<script>
+    $(document).keydown(function (event) {
+        if ($.DialogByZ.state) {
+            $(".zbox-popup-button[index_key='"+event.keyCode+"']").click();
+            return false;
+        } else if(event.keyCode == 13) {
+            $("#submit_button").click();
+        }
+    });
+
+
+var market_info = null;
+
+$.validator.setDefaults({
+    submitHandler: function() {
+        var url = U("PyMarket","product_update");
+        var data = $("form").serialize() + "&login_role_id="+getQueryString("login_role_id");
+        var options = {
+            'type': "POST",
+            'cache':false,
+            'url': url,
+            'data': data,
+            'beforeSend':function(){
+                showProgressDialog("提交中...");
+            },
+            'success': function(data) {
+                if (data.code == 0) {
+                    cordova.exec(null, null, "BabyPlugin", "complete_market", [data.body,"edit"]);
+                } else {
+                    $.DialogByZ.Alert({Title: "", Content: data.error,FunL:function(){
+                        $.DialogByZ.Close();
+                    }});
+                }
+            },
+            'error':function(xhr,status,error) {
+                $.DialogByZ.Alert({Title: "", Content: status,FunL:function(){
+                    $.DialogByZ.Close();
+                }});
+            },
+            'complete':function(){
+                hideProgressDialog();
+            }
+        };
+        $.ajax(options);
+    }
+});
+
+$().ready(function() {
+    $("#form").validate();
+});
+
+function on_save() {
+    $("#form").submit();
+}
+
+function on_back() {
+    $.DialogByZ.Confirm({Title: "", Content: "确定要未保存退出吗?",FunL:function(){
+	        finish_activity("back");
+	},FunR:function(){$.DialogByZ.Close()}})
+}
+
+
+function on_real_start_time_picked() {
+    var start_time = $("#real_start_time").val();
+    if (start_time) {
+        $("#real_end_time").removeAttr("disabled");
+    } else {
+        $("#real_end_time").val("");
+        $("#real_end_time").attr("disabled","disabled");
+    }
+    on_recess_day_change();
+}
+
+function calculate_service_day() {
+    var start_time = $("#real_start_time").val();
+    if (start_time) {
+        var end_time = $("#real_end_time").val();
+    }
+    if (start_time == "" || end_time == "") {
+        return 0;
+    }
+    return moment(end_time, "YYYY-MM-DD HH:mm").diff(moment(start_time, "YYYY-MM-DD HH:mm"), 'hours');
+}
+
+function calculate_agency_money() {
+    var agency_scale = $("#agency_scale").val();
+    if (!agency_scale) agency_scale = 0;
+    agency_scale = parseFloat(agency_scale);
+
+    var settle_price = $("#settle_price").val();
+    if (!settle_price) settle_price = 0;
+    settle_price = parseFloat(settle_price);
+
+    var agency = Math.ceil(settle_price * agency_scale / 100);
+    $("#agency").val(agency);
+    calculate_salary_money();
+}
+
+function on_recess_day_change() {
+    product_datapick.calculate_service_duration();
+}
+
+function calculate_settle_money() {
+    product_datapick.calculate_settle_money();
+}
+
+function on_agency_change() {
+    var settle_price = $("#settle_price").val();
+    if (!settle_price) settle_price = 0;
+    settle_price = parseFloat(settle_price);
+    if (settle_price != 0) {
+        var agency = $("#agency").val();
+        if (agency != 0) {
+            agency = Math.floor(parseFloat(agency));
+            var agency_scale = agency/settle_price * 100;
+            $("#agency_scale").val(agency_scale.toFixed(2));
+        }
+    }
+
+    calculate_salary_money();
+}
+
+function calculate_salary_money() {
+    var agency = $("#agency").val();
+    if (!agency) agency = 0;
+    agency = Math.floor(parseFloat(agency));
+
+    var settle_price = $("#settle_price").val();
+    if (!settle_price) settle_price = 0;
+    settle_price = parseFloat(settle_price);
+    $("#salary").val(settle_price - agency);
+}
+
+function assign_market_product_info(market_product) {
+    $("#market_product_id").val(market_product.market_product_id);
+    $("#real_start_time").val(market_product.real_start_time);
+    $("#real_end_time").val(market_product.real_end_time);
+    $("#recess_day").val(market_product.recess_day);
+    $("#service_duration").val(market_product.service_duration);
+    $("#service_price").val(market_product.service_price);
+    $("#price").val(market_product.price);
+    $("#description").val(market_product.description);
+    $("#agency_scale").val(market_product.agency_scale);
+    $("#agency").val(market_product.agency);
+    $("#salary").val(market_product.salary);
+    $("#settle_price").val(market_product.settle_price);
+    $("#settle_duration").val(market_product.settle_duration);
+    $("#product_id").val(market_product.product_id);
+    $("#product_name").val(market_product.product_name);
+    $("#product_idcode").val(market_product.product_idcode);
+}
+
+function on_product_info(product_info) {
+    if (product_info.skill == "") {
+        $.DialogByZ.Alert({Title: "", Content: "选择的雇员没有服务类别， 不能创建订单!",FunL:function(){
+	        $.DialogByZ.Close();
+	   }});
+       return;
+    }
+    var skill_cate = product_info.skill_info[market_info.category_id];
+    if ($("#service_price").val() == "") {
+        $("#service_price").val(skill_cate.salary);
+    }
+
+    if (skill_cate['agency_scale'] != 0) {
+        $('#agency_scale').val(skill_cate['agency_scale']);
+    }
+
+    $("#product_id").val(product_info.product_id);
+    $("#product_name").val(product_info.name + "-" + product_info.idcode);
+}
+
+function on_select_product() {
+    var search = {};
+    if (market_info.category_id == 6) {
+        search['category_id'] = [2, market_info.category_id];
+    } else {
+        search['category_id'] = [market_info.category_id];
+    }
+
+    if ($.inArray(market_info.category_id,['2','3','6']) != -1) {
+        search['workstate_id'] = "面试";
+    }
+    select_product(function(data) {
+        if (data.code == 0) {
+            on_product_info(data.body);
+        }
+    }, search);
+}
+
+function on_new_market_product(market) {
+   $("#agency_scale").val(market.agency_scale);
+   $("#service_price").val(market.money);
+   on_real_start_time_picked();
+}
+
+function on_edit_market_product(market, market_product) {
+    assign_market_product_info(market_product);
+}
+
+function on_response_market(market) {
+    market_info = market;
+    if (market_info.category_id == '12') {
+        product_datapick = product_datapick_keepsake;
+    }else if(market_info.serve_modality == '1'){
+        product_datapick = product_datapick_special;
+    } else {
+        product_datapick = product_datapick_general;
+    }
+    $("#sum_settle_price").attr("readonly","readonly");
+    $("#reality_price").attr("readonly","readonly");
+    $("#salary").attr("readonly","readonly");
+    $("#settle_price").attr("readonly","readonly");
+    $("#price").attr("readonly","readonly");
+    $("#service_duration").attr("readonly","readonly");
+
+    product_datapick.init();
+
+    var market_product_id = getQueryString("market_product_id");
+    if (market_product_id) {
+        var url = U("PyMarket","getproductinfo");
+        var options = {
+            'url': url,
+            'cache':false,
+            'data': {
+                'id':market_product_id,
+                "login_role_id":getQueryString("login_role_id")
+            },
+            'success': function(data) {
+                if (data.code == 0) {
+                    on_edit_market_product(market, data.body);
+                } else {
+                    showToash(data.error);
+                    finish_activity();
+                }
+            },
+            'error':function(xhr,status,error) {
+                showToash(status);
+                finish_activity();
+            }
+        };
+        $.ajax(options);
+    } else {
+        on_new_market_product(market);
+    }
+}
+
+
+var product_datapick_keepsake={
+    init: function () {
+        $("#recess_day").attr("readonly","readonly");
+        $("#time_adjust").attr("readonly","readonly");
+        $("#service_price").attr("readonly","readonly");
+        $("#settle_duration").attr("readonly","readonly");
+        $("#settle_duration").val("1");
+
+        $("#service_price").change(on_recess_day_change);
+        $("#money_adjust").change(calculate_settle_money);
+        $("#agency_scale").change(calculate_agency_money);
+        $("#settle_duration").change(calculate_settle_money);
+        $("#agency").change(on_agency_change);
+    },
+
+    calculate_service_duration: function () {
+        var hours = calculate_service_day();
+        hours = parseFloat(hours);
+        var ssdays = hours % 24;
+        if (ssdays < 4 ) ssdays = 0;
+        else if ( ssdays < 16) ssdays = 0.5;
+        else ssdays = 1;
+        var days = parseInt(hours / 24) + ssdays;
+
+        var service_duration = Math.max(days, 0);
+        $("#service_duration").val(service_duration);
+        calculate_settle_money();
+    },
+
+    calculate_settle_money: function () {
+
+        var money_adjust = $("#money_adjust").val();
+        if (!money_adjust) money_adjust = 0;
+        money_adjust = parseFloat(money_adjust);
+
+        var price = Math.round(parseFloat(money_adjust));
+        $("#price").val(price);
+
+        var settle_price = Math.round(parseFloat( money_adjust));
+        $("#settle_price").val(settle_price);
+
+        calculate_agency_money();
+    }
+};
+
+
+var product_datapick_special={
+    init: function () {
+        $("#recess_day").attr("readonly","readonly");
+        $("#time_adjust").attr("readonly","readonly");
+        $("#service_price").change(on_recess_day_change);
+        $("#money_adjust").change(calculate_settle_money);
+        $("#agency_scale").change(calculate_agency_money);
+        $("#settle_duration").change(calculate_settle_money);
+        $("#agency").change(on_agency_change);
+    },
+
+    calculate_service_duration: function () {
+        var hours = calculate_service_day();
+        hours = parseFloat(hours);
+        var ssdays = hours % 24;
+        if (ssdays < 4 ) ssdays = 0;
+        else if ( ssdays < 16) ssdays = 0.5;
+        else ssdays = 1;
+        var days = parseInt(hours / 24) + ssdays;
+
+        var service_duration = Math.max(days, 0);
+        $("#service_duration").val(service_duration);
+
+        calculate_settle_money();
+    },
+
+    calculate_settle_money: function () {
+        var settle_duration = $("#settle_duration").val();
+        if (!settle_duration) settle_duration = 0;
+        settle_duration = parseFloat(settle_duration);
+
+        var service_price = $("#service_price").val();
+        if (!service_price) service_price = 0;
+        service_price = parseFloat(service_price);
+
+        var price = Math.round(parseFloat(settle_duration * service_price));
+        $("#price").val(price);
+
+        var money_adjust = $("#money_adjust").val();
+        if (!money_adjust) money_adjust = 0;
+        money_adjust = parseFloat(money_adjust);
+
+        var settle_price = Math.round(parseFloat(price + money_adjust));
+        $("#settle_price").val(settle_price);
+
+        calculate_agency_money();
+    }
+};
+
+
+var product_datapick_general={
+    init: function () {
+        $("#settle_duration").attr("readonly","readonly");
+        $("#recess_day").val(market_info.recess_day);
+        $("#recess_day").change(on_recess_day_change);
+        $("#time_adjust").change(on_recess_day_change);
+        $("#service_price").change(on_recess_day_change);
+        $("#money_adjust").change(calculate_settle_money);
+        $("#agency_scale").change(calculate_agency_money);
+        $("#agency").change(on_agency_change);
+    },
+
+    calculate_service_duration: function () {
+       var recess_day = $("#recess_day").val();
+        if (!recess_day) recess_day = 0;
+        recess_day = parseFloat(recess_day);
+
+        var hours = calculate_service_day();
+        hours = parseFloat(hours);
+        var ssdays = hours % 24;
+        if (ssdays < 4 ) ssdays = 0;
+        else if ( ssdays < 16) ssdays = 0.5;
+        else ssdays = 1;
+        var days = parseInt(hours / 24) + ssdays;
+
+        var service_duration = Math.max(days - recess_day, 0);
+        $("#service_duration").val(service_duration);
+
+        var time_adjust = $("#time_adjust").val();
+        if (!time_adjust) time_adjust = 0;
+        time_adjust = parseFloat(time_adjust);
+
+        $("#settle_duration").val(service_duration + time_adjust);
+        calculate_settle_money();
+    },
+
+    calculate_settle_money: function () {
+         var service_duration = $("#service_duration").val();
+        if (!service_duration) service_duration = 0;
+        service_duration = parseFloat(service_duration);
+
+        var service_price = $("#service_price").val();
+        if (!service_price) service_price = 0;
+        service_price = parseFloat(service_price);
+
+        if (market_info.category_id == '6' || market_info.category_id == '14') {
+            var price = Math.round(parseFloat(service_duration * service_price));
+        } else {
+            var price = Math.round(parseFloat(service_duration * service_price / 26));
+        }
+        $("#price").val(price);
+
+        var settle_duration = $("#settle_duration").val();
+        if (!settle_duration) settle_duration = 0;
+        settle_duration = parseFloat(settle_duration);
+
+        var money_adjust = $("#money_adjust").val();
+        if (!money_adjust) money_adjust = 0;
+        money_adjust = parseFloat(money_adjust);
+        if (market_info.category_id == '6' || market_info.category_id == '14') {
+            var settle_price = Math.round(parseFloat(service_price * settle_duration + money_adjust));
+        } else {
+            var settle_price = Math.round(parseFloat(service_price / 26 * settle_duration + money_adjust));
+        }
+        $("#settle_price").val(settle_price);
+
+        calculate_agency_money();
+    }
+};
+var product_datapick = product_datapick_general;
+
+document.addEventListener("deviceready", function(){
+    var market_id = getQueryString("id");
+    var url = U("PyMarket","getinfo");
+    var options = {
+        'url': url,
+        'cache':false,
+        'data': {
+            'id':market_id,
+            "login_role_id":getQueryString("login_role_id")
+        },
+        'beforeSend':function(){
+            showProgressDialog("请等待...");
+        },
+        'success': function(data) {
+            if (data.code == 0) {
+                on_response_market(data.body);
+            } else {
+                showToash(data.error);
+                finish_activity();
+            }
+        },
+        'error':function(xhr,status,error) {
+            showToash(status);
+            finish_activity();
+        },
+        'complete':function(){
+            hideProgressDialog();
+        }
+    };
+    $.ajax(options);
+    $("#market_id").val(market_id);
+});
+</script>
